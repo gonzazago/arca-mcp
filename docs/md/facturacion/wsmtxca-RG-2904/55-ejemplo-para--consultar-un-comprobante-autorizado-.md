@@ -1,0 +1,173 @@
+##### Ejemplo para “Consultar un Comprobante autorizado” 
+
+
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://impl.service.wsmtxca.afip.gob.ar/service/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <consultarComprobanteRequest>
+      <authRequest>
+        <token>
+          un string
+        </token>
+        <sign>
+          un string
+        </sign>
+        <cuitRepresentada>
+          66666666666
+        </cuitRepresentada>
+      </authRequest>
+      <consultaComprobanteRequest>
+        <codigoTipoComprobante>
+          1
+        </codigoTipoComprobante>
+        <numeroPuntoVenta>
+          4000
+        </numeroPuntoVenta>
+        <numeroComprobante>
+          1
+        </numeroComprobante>
+      </consultaComprobanteRequest>
+      ,Consultar un comprobante autorizado (consultarComprobante)
+    </consultarComprobanteRequest>
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://impl.service.wsmtxca.afip.gob.ar/service/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <ser:consultarComprobanteResponse>
+      <comprobante>
+        <codigoTipoComprobante>
+          1
+        </codigoTipoComprobante>
+        <numeroPuntoVenta>
+          4000
+        </numeroPuntoVenta>
+        <numeroComprobante>
+          1
+        </numeroComprobante>
+        <fechaEmision>
+          2010-11-01
+        </fechaEmision>
+        <codigoTipoAutorizacion>
+          E
+        </codigoTipoAutorizacion>
+        <codigoAutorizacion>
+          12345678901234
+        </codigoAutorizacion>
+        <fechaVencimiento>
+          2010-11-16
+        </fechaVencimiento>
+        <codigoTipoDocumento>
+          80
+        </codigoTipoDocumento>
+        <numeroDocumento>
+          30000000007
+        </numeroDocumento>
+        <condicionIVAReceptor>
+          1
+        </condicionIVAReceptor>
+        <importeGravado>
+          100.00
+        </importeGravado>
+        <importeNoGravado>
+          0.00
+        </importeNoGravado>
+        <importeExento>
+          0.00
+        </importeExento>
+        <importeSubtotal>
+          100.00
+        </importeSubtotal>
+        <importeOtrosTributos>
+          100.00
+        </importeOtrosTributos>
+        <importeTotal>
+          122.00
+        </importeTotal>
+        <codigoMoneda>
+          PES
+        </codigoMoneda>
+        <cotizacionMoneda>
+          1
+        </cotizacionMoneda>
+        <cancelaEnMismaMonedaExtranjera>
+          N
+        </cancelaEnMismaMonedaExtranjera>
+        <observaciones>
+          Observaciones Comerciales, libre
+        </observaciones>
+        ,Consultar un comprobante autorizado (consultarComprobante)
+        <codigoConcepto>
+          1
+        </codigoConcepto>
+        <arrayOtrosTributos>
+          <otroTributo>
+            <codigo>
+              99
+            </codigo>
+            <descripcion>
+              Otro Tributo
+            </descripcion>
+            <baseImponible>
+              100
+            </baseImponible>
+            <importe>
+              1.00
+            </importe>
+          </otroTributo>
+        </arrayOtrosTributos>
+        <arrayItems>
+          <item>
+            <codigoMtx>
+              mtx0001
+            </codigoMtx>
+            <codigo>
+              P0001
+            </codigo>
+            <descripcion>
+              Descripción del producto P0001
+            </descripcion>
+            <cantidad>
+              1.00
+            </cantidad>
+            <codigoUnidadMedida>
+              7
+            </codigoUnidadMedida>
+            <precioUnitario>
+              100.00
+            </precioUnitario>
+            <importeBonificacion>
+              0.00
+            </importeBonificacion>
+            <codigoCondicionIVA>
+              5
+            </codigoCondicionIVA>
+            <importeIVA>
+              21.00
+            </importeIVA>
+            <importeItem>
+              121.00
+            </importeItem>
+          </item>
+        </arrayItems>
+        <arraySubtotalesIVA>
+          <subtotalIVA>
+            <codigo>
+              5
+            </codigo>
+            <importe>
+              21.00
+            </importe>
+          </subtotalIVA>
+        </arraySubtotalesIVA>
+      </comprobante>
+      ,Consultar un comprobante autorizado (consultarComprobante)
+    </ser:consultarComprobanteResponse>
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ /soapenv:Envelope> 

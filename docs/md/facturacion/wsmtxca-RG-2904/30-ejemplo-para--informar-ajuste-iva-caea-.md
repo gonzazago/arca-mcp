@@ -1,0 +1,381 @@
+##### Ejemplo para “Informar Ajuste IVA CAEA” 
+
+Ejemplo Nota Débito A 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://impl.service.wsmtxca.afip.gob.ar/service/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <ser:informarAjusteIVACAEARequest>
+      <authRequest>
+        <token>
+          un string
+        </token>
+        <sign>
+          un string
+        </sign>
+        <cuitRepresentada>
+          66666666666
+        </cuitRepresentada>
+      </authRequest>
+      <comprobanteCAEARequest>
+        <codigoTipoComprobante>
+          2
+        </codigoTipoComprobante>
+        <numeroPuntoVenta>
+          1100
+        </numeroPuntoVenta>
+        <numeroComprobante>
+          25
+        </numeroComprobante>
+        ,Informar un Ajuste IVA CAEA (informarAjusteIVACAEA)
+        <fechaEmision>
+          2011-01-31
+        </fechaEmision>
+        <codigoTipoAutorizacion>
+          A
+        </codigoTipoAutorizacion>
+        <codigoAutorizacion>
+          21024364479618
+        </codigoAutorizacion>
+        <codigoTipoDocumento>
+          80
+        </codigoTipoDocumento>
+        <numeroDocumento>
+          30000000007
+        </numeroDocumento>
+        <condicionIVAReceptor>
+          1
+        </condicionIVAReceptor>
+        <importeSubtotal>
+          0
+        </importeSubtotal>
+        <importeTotal>
+          200
+        </importeTotal>
+        <codigoMoneda>
+          DOL
+        </codigoMoneda>
+        <cotizacionMoneda>
+          4
+        </cotizacionMoneda>
+        <codigoConcepto>
+          1
+        </codigoConcepto>
+        <arrayComprobantesAsociados>
+          <comprobanteAsociado>
+            <codigoTipoComprobante>
+              1
+            </codigoTipoComprobante>
+            <numeroPuntoVenta>
+              1
+            </numeroPuntoVenta>
+            <numeroComprobante>
+              1
+            </numeroComprobante>
+          </comprobanteAsociado>
+        </arrayComprobantesAsociados>
+        <arrayItems>
+          <item>
+            <unidadesMtx>
+              1
+            </unidadesMtx>
+            <codigoMtx>
+              7790001001139
+            </codigoMtx>
+            <codigo>
+            </codigo>
+            <descripcion>
+              Nota de Débito Ajuste de IVA
+            </descripcion>
+            <codigoUnidadMedida>
+              7
+            </codigoUnidadMedida>
+            <codigoCondicionIVA>
+              5
+            </codigoCondicionIVA>
+            <importeIVA>
+              100
+            </importeIVA>
+            <importeItem>
+              100
+            </importeItem>
+          </item>
+          <item>
+            <unidadesMtx>
+              1
+            </unidadesMtx>
+            <codigoMtx>
+              7790001001139
+            </codigoMtx>
+            <codigo>
+            </codigo>
+            ,Informar un Ajuste IVA CAEA (informarAjusteIVACAEA)
+            <descripcion>
+              Nota de Débito Ajuste de IVA
+            </descripcion>
+            <codigoUnidadMedida>
+              7
+            </codigoUnidadMedida>
+            <codigoCondicionIVA>
+              6
+            </codigoCondicionIVA>
+            <importeIVA>
+              100
+            </importeIVA>
+            <importeItem>
+              100
+            </importeItem>
+          </item>
+        </arrayItems>
+        <arraySubtotalesIVA>
+          <subtotalIVA>
+            <codigo>
+              5
+            </codigo>
+            <importe>
+              100
+            </importe>
+          </subtotalIVA>
+          <subtotalIVA>
+            <codigo>
+              6
+            </codigo>
+            <importe>
+              100
+            </importe>
+          </subtotalIVA>
+        </arraySubtotalesIVA>
+        <arrayActividades>
+          <actividad>
+            <codigo>
+              120010
+            </codigo>
+          </actividad>
+          <actividad>
+            <codigo>
+              463300
+            </codigo>
+          </actividad>
+        </arrayActividades>
+      </comprobanteCAEARequest>
+    </ser:informarAjusteIVACAEARequest>
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  ,Informar un Ajuste IVA CAEA (informarAjusteIVACAEA)
+  <soapenv:Body>
+    <ns1:informarAjusteIVACAEAResponse xmlns:ns1="http://impl.service.wsmtxca.afip.gob.ar/service/">
+      <resultado>
+        A
+      </resultado>
+      <fechaProceso>
+        2011-02-26-02:00
+      </fechaProceso>
+      <comprobanteCAEAResponse>
+        <CAEA>
+          21024364479618
+        </CAEA>
+        <codigoTipoComprobante>
+          2
+        </codigoTipoComprobante>
+        <numeroPuntoVenta>
+          1100
+        </numeroPuntoVenta>
+        <numeroComprobante>
+          25
+        </numeroComprobante>
+      </comprobanteCAEAResponse>
+    </ns1:informarAjusteIVACAEAResponse>
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ Ejemplo Nota de Débito B 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://impl.service.wsmtxca.afip.gob.ar/service/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <ser:informarAjusteIVACAEARequest>
+      <authRequest>
+        <token>
+          un string
+        </token>
+        <sign>
+          un string
+        </sign>
+        <cuitRepresentada>
+          66666666666
+        </cuitRepresentada>
+      </authRequest>
+      <comprobanteCAEARequest>
+        <codigoTipoComprobante>
+          7
+        </codigoTipoComprobante>
+        <numeroPuntoVenta>
+          1100
+        </numeroPuntoVenta>
+        <numeroComprobante>
+          6
+        </numeroComprobante>
+        <fechaEmision>
+          2011-01-31
+        </fechaEmision>
+        <codigoTipoAutorizacion>
+          A
+        </codigoTipoAutorizacion>
+        <codigoAutorizacion>
+          21024364479618
+        </codigoAutorizacion>
+        ,Informar un Ajuste IVA CAEA (informarAjusteIVACAEA)
+        <codigoTipoDocumento>
+          80
+        </codigoTipoDocumento>
+        <numeroDocumento>
+          30000000007
+        </numeroDocumento>
+        <condicionIVAReceptor>
+          5
+        </condicionIVAReceptor>
+        <importeSubtotal>
+          0
+        </importeSubtotal>
+        <importeTotal>
+          200
+        </importeTotal>
+        <codigoMoneda>
+          DOL
+        </codigoMoneda>
+        <cotizacionMoneda>
+          4
+        </cotizacionMoneda>
+        <codigoConcepto>
+          1
+        </codigoConcepto>
+        <arrayComprobantesAsociados>
+          <comprobanteAsociado>
+            <codigoTipoComprobante>
+              6
+            </codigoTipoComprobante>
+            <numeroPuntoVenta>
+              1
+            </numeroPuntoVenta>
+            <numeroComprobante>
+              1
+            </numeroComprobante>
+          </comprobanteAsociado>
+        </arrayComprobantesAsociados>
+        <arrayItems>
+          <item>
+            <unidadesMtx>
+              1
+            </unidadesMtx>
+            <codigoMtx>
+              7790001001139
+            </codigoMtx>
+            <codigo>
+            </codigo>
+            <descripcion>
+              Nota de Débito Ajuste de IVA
+            </descripcion>
+            <codigoUnidadMedida>
+              7
+            </codigoUnidadMedida>
+            <codigoCondicionIVA>
+              5
+            </codigoCondicionIVA>
+            <importeItem>
+              100
+            </importeItem>
+          </item>
+          <item>
+            <unidadesMtx>
+              1
+            </unidadesMtx>
+            <codigoMtx>
+              7790001001139
+            </codigoMtx>
+            <codigo>
+            </codigo>
+            <descripcion>
+              Nota de Débito Ajuste de IVA
+            </descripcion>
+            <codigoUnidadMedida>
+              7
+            </codigoUnidadMedida>
+            <codigoCondicionIVA>
+              6
+            </codigoCondicionIVA>
+            <importeItem>
+              100
+            </importeItem>
+            ,Informar un Ajuste IVA CAEA (informarAjusteIVACAEA)
+          </item>
+        </arrayItems>
+        <arraySubtotalesIVA>
+          <subtotalIVA>
+            <codigo>
+              5
+            </codigo>
+            <importe>
+              100
+            </importe>
+          </subtotalIVA>
+          <subtotalIVA>
+            <codigo>
+              6
+            </codigo>
+            <importe>
+              100
+            </importe>
+          </subtotalIVA>
+        </arraySubtotalesIVA>
+        <arrayActividades>
+          <actividad>
+            <codigo>
+              120010
+            </codigo>
+          </actividad>
+          <actividad>
+            <codigo>
+              463300
+            </codigo>
+          </actividad>
+        </arrayActividades>
+      </comprobanteCAEARequest>
+    </ser:informarAjusteIVACAEARequest>
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Body>
+    <ns1:informarAjusteIVACAEAResponse xmlns:ns1="http://impl.service.wsmtxca.afip.gob.ar/service/">
+      <resultado>
+        A
+      </resultado>
+      <fechaProceso>
+        2011-02-26-02:00
+      </fechaProceso>
+      <comprobanteCAEAResponse>
+        <CAEA>
+          21024364479618
+        </CAEA>
+        ,Informar un Ajuste IVA CAEA (informarAjusteIVACAEA)
+        <codigoTipoComprobante>
+          7
+        </codigoTipoComprobante>
+        <numeroPuntoVenta>
+          1100
+        </numeroPuntoVenta>
+        <numeroComprobante>
+          6
+        </numeroComprobante>
+      </comprobanteCAEAResponse>
+    </ns1:informarAjusteIVACAEAResponse>
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ 

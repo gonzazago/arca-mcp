@@ -1,0 +1,10 @@
+##### Mensaje de Solicitud 
+
+**Esquema** 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Header/>
+  <soapenv:Body/>
+</soapenv:Envelope>
+```
+ 

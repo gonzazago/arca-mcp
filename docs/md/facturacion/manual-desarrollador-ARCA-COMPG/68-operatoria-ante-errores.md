@@ -1,0 +1,2306 @@
+##### Operatoria ante errores 
+
+Metodología sugerida ante el rechazo de un requerimiento con múltiples comprobantes: Suponiendo que se envían 100 comprobantes en un request y el mismo es de Facturas A, punto de venta 1 y los comprobantes son desde el número 51 al 150, se nos plantean 3 situaciones. 
+
+, Aceptación total: donde, cada uno de los 100 comprobantes fue aprobado. El campo Resultado será igual A  Rechazo total: se puede dar por dos grandes causas, una por problemas del emisor y/o inconsistencia en la cabecera, y otra por el rechazo de cada uno de los 100 comprobantes. En el primer caso el response contendrá solamente en el tag Errors con todas las causas involucradas; en el segundo caso se incluirá el tag FeCabResp, FeDetResp y Observaciones o Errors con el motivo de rechazo de cada uno de los comprobantes. El campo Resultado será igual a R.  Rechazo parcial: se da cuando alguno de los comprobantes incluidos en el request es rechazado. A modo de ejemplo y con los parámetros antes descriptos, se aprueban los comprobantes del 51 al 100, 101 saldrá rechazado y del 102 al 150 saldrá como no procesado; esto se debe a que como debe existir correlatividad numérica y de fecha, ante una inconsistencia los comprobantes subsiguientes también se rechazaran. Si se diese este caso, y para proseguir con la autorización de comprobantes se deberá subsanar los errores del comprobante 102 y así enviar un nuevo request. El campo Resultado será igual a P. Operatoria con errores de comunicación: En el diseño del WsfeV1 se ha previsto que dada la complejidad actual de las comunicacionespueden ocurrir interrupciones en la comunicación entre el cliente y el WsfeV1 básicamente, el problema podría resumirse al siguiente escenario: el cliente envía una solicitud de informar comprobantes con CAEA y se queda esperando una respuesta que no llega, hasta que transcurrido algún tiempo, se produce una condición de time-out. En ese caso, el usuario no sabrá si la solicitud le llegó al WsfeV1 y fue procesado fallando la comunicación durante el retorno, o bien si la falla ocurrió durante el envío de la solicitud y simplemente WsfeV1 nunca la recibió. En el segundo caso, con simplemente enviar la misma solicitud todo quedaría resuelto, pero en el primer caso, si el cliente envía nuevamente la misma solicitud para la/s misma/s factura, WsfeV1 devolvería un error de consecutividad puesto que en la base de datos de arca ese comprobante ya figura como emitido. Para estos casos, se utiliza el método FECompConsultar, que dado el tipo de comprobante, punto de venta y numero de comprobante, retorna toda la información enviada en el método de registración de comprobantes con CAEA (FECAEARegInformativo) más el resultado (A: Aprobado), tipo de emisión (en este caso CAEA), fecha de vencimiento, fecha de proceso y de corresponder las observaciones realizadas al comprobante. El WsfeV1 también ofrece un método para consultar el último comprobante autorizado (FECompUltimoAutorizado) para un determinado tipo de comprobante y punto de venta. 
+
+,##### Operatoria ante errores, Ejemplos 
+
+Se envía un request informando una Factura A. La totalidad del comprobante es No Gravado. Sin errores. **REQUEST** 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    
+```xml
+
+```xml
+<ar:FECAEARegInformativo>
+  <ar:Auth>
+    <ar:Token>
+      PD…
+    </ar:Token>
+    <ar:Sign>
+      IT…
+    </ar:Sign>
+    <ar:Cuit>
+      23000000004
+    </ar:Cuit>
+  </ar:Auth>
+  <ar:FeCAEARegInfReq>
+    
+```xml
+<ar:FeCabReq>
+  <ar:CantReg>
+    1
+  </ar:CantReg>
+  <ar:PtoVta>
+    9800
+  </ar:PtoVta>
+  <ar:CbteTipo>
+    1
+  </ar:CbteTipo>
+</ar:FeCabReq>
+```
+
+    
+```xml
+<ar:FeDetReq>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      33
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      33
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      100.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      100.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      0.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    <ar:ImpTrib>
+      0
+    </ar:ImpTrib>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CondicionIVAReceptorId>
+      1
+    </ar:CondicionIVAReceptorId>
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+</ar:FeDetReq>
+```
+
+  </ar:FeCAEARegInfReq>
+</ar:FECAEARegInformativo>
+```
+
+```
+
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ 
+
+,**RESPONSE** 
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    <FECAEARegInformativoResponse xmlns="http://ar.gov.afip.dif.FEV1/">
+      <FECAEARegInformativoResult>
+        <FeCabResp>
+          <Cuit>
+            23000000004
+          </Cuit>
+          <PtoVta>
+            9800
+          </PtoVta>
+          <CbteTipo>
+            1
+          </CbteTipo>
+          <FchProceso>
+            20110306
+          </FchProceso>
+          <CantReg>
+            1
+          </CantReg>
+          <Resultado>
+            A
+          </Resultado>
+          <Reproceso>
+            N
+          </Reproceso>
+        </FeCabResp>
+        <FeDetResp>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              33
+            </CbteDesde>
+            <CbteHasta>
+              33
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              A
+            </Resultado>
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+        </FeDetResp>
+      </FECAEARegInformativoResult>
+    </FECAEARegInformativoResponse>
+  </soap:Body>
+</soap:Envelope>
+```
+ Informa una Factura A. La totalidad del comprobante es No Gravado, donde no se supera la totalidad de las validaciones de la CUIT emisora. **REQUEST** 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    
+```xml
+
+```xml
+<ar:FECAEARegInformativo>
+  <ar:Auth>
+    <ar:Token>
+      PD…
+    </ar:Token>
+    <ar:Sign>
+      IT…
+    </ar:Sign>
+    <ar:Cuit>
+      23000000000
+    </ar:Cuit>
+    CUIT no supera las validaciones del ticket de acceso
+  </ar:Auth>
+  <ar:FeCAEARegInfReq>
+    
+```xml
+<ar:FeCabReq>
+  <ar:CantReg>
+    1
+  </ar:CantReg>
+  <ar:PtoVta>
+    9800
+  </ar:PtoVta>
+  ,
+  <ar:CbteTipo>
+    1
+  </ar:CbteTipo>
+</ar:FeCabReq>
+```
+
+    
+```xml
+<ar:FeDetReq>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      34
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      34
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      100.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      100.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      0.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    <ar:ImpTrib>
+      0
+    </ar:ImpTrib>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CondicionIVAReceptorId>
+      1
+    </ar:CondicionIVAReceptorId>
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+</ar:FeDetReq>
+```
+
+  </ar:FeCAEARegInfReq>
+</ar:FECAEARegInformativo>
+```
+
+```
+
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ **RESPONSE** 
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    <FECAEARegInformativoResponse xmlns="http://ar.gov.afip.dif.FEV1/">
+      <FECAEARegInformativoResult>
+        
+```xml
+
+```xml
+<Errors>
+   ERROR
+  <Err>
+    <Code>
+      600
+    </Code>
+    <Msg>
+      ValidacionDeToken: No apareció CUIT en lista de relaciones: 23000000000
+    </Msg>
+  </Err>
+</Errors>
+```
+
+```
+
+      </FECAEARegInformativoResult>
+    </FECAEARegInformativoResponse>
+  </soap:Body>
+</soap:Envelope>
+```
+ Informa una Factura A, con error en la cabecera (FeCabReq) del comprobante, tipo de comprobante inválido. Genera un Rechazo del comprobante. **REQUEST** 
+
+,
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    
+```xml
+
+```xml
+<ar:FECAEARegInformativo>
+  <ar:Auth>
+    <ar:Token>
+      PD..
+    </ar:Token>
+    <ar:Sign>
+      IT…
+    </ar:Sign>
+    <ar:Cuit>
+      23000000004
+    </ar:Cuit>
+  </ar:Auth>
+  <ar:FeCAEARegInfReq>
+    
+```xml
+<ar:FeCabReq>
+  <ar:CantReg>
+    1
+  </ar:CantReg>
+  <ar:PtoVta>
+    9800
+  </ar:PtoVta>
+  <ar:CbteTipo>
+    0
+  </ar:CbteTipo>
+   Tipo de Comprobante Inválido
+</ar:FeCabReq>
+```
+
+    
+```xml
+<ar:FeDetReq>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      34
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      34
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      100.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      100.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      0.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    <ar:ImpTrib>
+      0
+    </ar:ImpTrib>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CondicionIVAReceptorId>
+      1
+    </ar:CondicionIVAReceptorId>
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+</ar:FeDetReq>
+```
+
+  </ar:FeCAEARegInfReq>
+</ar:FECAEARegInformativo>
+```
+
+```
+
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ **RESPONSE** 
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    <FECAEARegInformativoResponse xmlns="http://ar.gov.afip.dif.FEV1/">
+      <FECAEARegInformativoResult>
+        <FeCabResp>
+          <Cuit>
+            23000000004
+          </Cuit>
+          <PtoVta>
+            9800
+          </PtoVta>
+          <CbteTipo>
+            0
+          </CbteTipo>
+          <FchProceso>
+            20110306
+          </FchProceso>
+          ,
+          <CantReg>
+            1
+          </CantReg>
+          <Resultado>
+            R
+          </Resultado>
+           Rechazo
+          <Reproceso>
+            N
+          </Reproceso>
+        </FeCabResp>
+        <FeDetResp>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              34
+            </CbteDesde>
+            <CbteHasta>
+              34
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              R
+            </Resultado>
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+        </FeDetResp>
+        
+```xml
+
+```xml
+<Errors>
+   Detalle del error
+  <Err>
+    <Code>
+      700
+    </Code>
+    <Msg>
+      Campo CbteTipo no se corresponde con alguno de los habilitados 1, 2 ,3, 6, 7 u 8.
+    </Msg>
+  </Err>
+</Errors>
+```
+
+```
+
+      </FECAEARegInformativoResult>
+    </FECAEARegInformativoResponse>
+  </soap:Body>
+</soap:Envelope>
+```
+ Informa una Factura A, con error en el detalle (FeDetReq) del comprobante tipo de concepto inválido. Genera un Rechazo del comprobante **REQUEST** 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    
+```xml
+
+```xml
+<ar:FECAEARegInformativo>
+  <ar:Auth>
+    <ar:Token>
+      PD..
+    </ar:Token>
+    <ar:Sign>
+      IT…
+    </ar:Sign>
+    <ar:Cuit>
+      23000000004
+    </ar:Cuit>
+  </ar:Auth>
+  <ar:FeCAEARegInfReq>
+    
+```xml
+<ar:FeCabReq>
+  <ar:CantReg>
+    1
+  </ar:CantReg>
+  <ar:PtoVta>
+    9800
+  </ar:PtoVta>
+  <ar:CbteTipo>
+    1
+  </ar:CbteTipo>
+</ar:FeCabReq>
+```
+
+    
+```xml
+<ar:FeDetReq>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      4
+    </ar:Concepto>
+     4 valor no permitido
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      34
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      34
+    </ar:CbteHasta>
+    ,
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      100.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      100.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      0.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    <ar:ImpTrib>
+      0
+    </ar:ImpTrib>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CondicionIVAReceptorId>
+      1
+    </ar:CondicionIVAReceptorId>
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+</ar:FeDetReq>
+```
+
+  </ar:FeCAEARegInfReq>
+</ar:FECAEARegInformativo>
+```
+
+```
+
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ **RESPONSE** 
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    <FECAEARegInformativoResponse xmlns="http://ar.gov.afip.dif.FEV1/">
+      <FECAEARegInformativoResult>
+        <FeCabResp>
+          <Cuit>
+            23000000004
+          </Cuit>
+          <PtoVta>
+            9800
+          </PtoVta>
+          <CbteTipo>
+            1
+          </CbteTipo>
+          <FchProceso>
+            20110306
+          </FchProceso>
+          <CantReg>
+            1
+          </CantReg>
+          <Resultado>
+            R
+          </Resultado>
+           Rechazo
+          <Reproceso>
+            N
+          </Reproceso>
+        </FeCabResp>
+        <FeDetResp>
+          <FECAEADetResponse>
+            <Concepto>
+              4
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              34
+            </CbteDesde>
+            <CbteHasta>
+              34
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              R
+            </Resultado>
+            <Observaciones>
+               Detalle de la causa del rechazo
+              <Obs>
+                <Code>
+                  713
+                </Code>
+                <Msg>
+                  El campo Concepto es obligatorio y debe corresponder con algún valor devuelto por el método FEParamGetTiposConcepto
+                </Msg>
+              </Obs>
+            </Observaciones>
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+          ,
+        </FeDetResp>
+      </FECAEARegInformativoResult>
+    </FECAEARegInformativoResponse>
+  </soap:Body>
+</soap:Envelope>
+```
+ Informa una Factura A, con error en el detalle del comprobante (FeDetReq) que no supera alguna de las validaciones No Excluyentes. Genera una Aprobación del comprobante con Observaciones. **REQUEST** 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    
+```xml
+
+```xml
+<ar:FECAEARegInformativo>
+  <ar:Auth>
+    <ar:Token>
+      PD..
+    </ar:Token>
+    <ar:Sign>
+      IT…
+    </ar:Sign>
+    <ar:Cuit>
+      23000000004
+    </ar:Cuit>
+  </ar:Auth>
+  <ar:FeCAEARegInfReq>
+    
+```xml
+<ar:FeCabReq>
+  <ar:CantReg>
+    1
+  </ar:CantReg>
+  <ar:PtoVta>
+    9800
+  </ar:PtoVta>
+  <ar:CbteTipo>
+    1
+  </ar:CbteTipo>
+</ar:FeCabReq>
+```
+
+    
+```xml
+<ar:FeDetReq>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      34
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      34
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      101.00
+    </ar:ImpTotal>
+     Importe total incorrecto
+    <ar:ImpTotConc>
+      100.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      0.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    <ar:ImpTrib>
+      0
+    </ar:ImpTrib>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CondicionIVAReceptorId>
+      1
+    </ar:CondicionIVAReceptorId>
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+</ar:FeDetReq>
+```
+
+  </ar:FeCAEARegInfReq>
+</ar:FECAEARegInformativo>
+```
+
+```
+
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ **RESPONSE** 
+
+,
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    <FECAEARegInformativoResponse xmlns="http://ar.gov.afip.dif.FEV1/">
+      <FECAEARegInformativoResult>
+        <FeCabResp>
+          <Cuit>
+            23000000004
+          </Cuit>
+          <PtoVta>
+            9800
+          </PtoVta>
+          <CbteTipo>
+            1
+          </CbteTipo>
+          <FchProceso>
+            20110306
+          </FchProceso>
+          <CantReg>
+            1
+          </CantReg>
+          <Resultado>
+            A
+          </Resultado>
+           Aprobado
+          <Reproceso>
+            N
+          </Reproceso>
+        </FeCabResp>
+        <FeDetResp>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              34
+            </CbteDesde>
+            <CbteHasta>
+              34
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              A
+            </Resultado>
+            <Observaciones>
+              Con Observaciones
+              <Obs>
+                <Code>
+                  724
+                </Code>
+                <Msg>
+                  El campo 'Importe Total' ImpTotal, debe ser igual a la suma de ImpTotConc + ImpNeto + ImpOpEx + ImpTrib + ImpIVA.
+                </Msg>
+              </Obs>
+            </Observaciones>
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+        </FeDetResp>
+      </FECAEARegInformativoResult>
+    </FECAEARegInformativoResponse>
+  </soap:Body>
+</soap:Envelope>
+```
+ Se envía un Request con tres Facturas A, que superan la totalidad de las validaciones. Genera una aprobación total de la solicitud. **REQUEST** 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    
+```xml
+
+```xml
+<ar:FECAEARegInformativo>
+  <ar:Auth>
+    <ar:Token>
+      PD…
+    </ar:Token>
+    <ar:Sign>
+      jd..
+    </ar:Sign>
+    <ar:Cuit>
+      23000000004
+    </ar:Cuit>
+    ,
+  </ar:Auth>
+  <ar:FeCAEARegInfReq>
+    
+```xml
+<ar:FeCabReq>
+  <ar:CantReg>
+    3
+  </ar:CantReg>
+  <ar:PtoVta>
+    9800
+  </ar:PtoVta>
+  <ar:CbteTipo>
+    1
+  </ar:CbteTipo>
+</ar:FeCabReq>
+```
+
+    
+```xml
+<ar:FeDetReq>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      35
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      35
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      200.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      100.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      100.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    <ar:ImpTrib>
+      0
+    </ar:ImpTrib>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CondicionIVAReceptorId>
+      1
+    </ar:CondicionIVAReceptorId>
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      36
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      36
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      101.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      100.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      0.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    <ar:ImpTrib>
+      1
+    </ar:ImpTrib>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    ```xml
+    <ar:Tributos>
+      <ar:Tributo>
+        <ar:Id>
+          99
+        </ar:Id>
+        <ar:Desc>
+          Otro tributo
+        </ar:Desc>
+        <ar:BaseImp>
+          100
+        </ar:BaseImp>
+        <ar:Alic>
+          1
+        </ar:Alic>
+        <ar:Importe>
+          1
+        </ar:Importe>
+      </ar:Tributo>
+    </ar:Tributos>
+    ```
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      37
+    </ar:CbteDesde>
+    ,
+    <ar:CbteHasta>
+      37
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      100.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      0.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      100.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    <ar:ImpTrib>
+      0
+    </ar:ImpTrib>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+</ar:FeDetReq>
+```
+
+  </ar:FeCAEARegInfReq>
+</ar:FECAEARegInformativo>
+```
+
+```
+
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ **RESPONSE** 
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    <FECAEARegInformativoResponse xmlns="http://ar.gov.afip.dif.FEV1/">
+      <FECAEARegInformativoResult>
+        <FeCabResp>
+          <Cuit>
+            23000000004
+          </Cuit>
+          <PtoVta>
+            9800
+          </PtoVta>
+          <CbteTipo>
+            1
+          </CbteTipo>
+          <FchProceso>
+            20110308
+          </FchProceso>
+          <CantReg>
+            3
+          </CantReg>
+          <Resultado>
+            A
+          </Resultado>
+           Aprobación total del envío
+          <Reproceso>
+            N
+          </Reproceso>
+        </FeCabResp>
+        <FeDetResp>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              35
+            </CbteDesde>
+            <CbteHasta>
+              35
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              A
+            </Resultado>
+             Aprobación del comprob.
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              36
+            </CbteDesde>
+            <CbteHasta>
+              36
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              A
+            </Resultado>
+             Aprobación del comprob. 
+
+,
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              36
+            </CbteDesde>
+            <CbteHasta>
+              36
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              A
+            </Resultado>
+             Aprobación del comprob.
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+        </FeDetResp>
+      </FECAEARegInformativoResult>
+    </FECAEARegInformativoResponse>
+  </soap:Body>
+</soap:Envelope>
+```
+ Se envía un Request con tres Facturas A (número 38, 39 y 40), donde la número 38 supera todas las validaciones excluyentes y la número 39 no supera una de las validaciones excluyentes. Genera una aprobación parcial de la solicitud, el comprobante 38 es aprobado, el 39 rechazado y el 40 no es procesado generando su rechazo. **REQUEST** 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    
+```xml
+
+```xml
+<ar:FECAEARegInformativo>
+  <ar:Auth>
+    <ar:Token>
+      PD…
+    </ar:Token>
+    <ar:Sign>
+      jd..
+    </ar:Sign>
+    <ar:Cuit>
+      23000000004
+    </ar:Cuit>
+  </ar:Auth>
+  <ar:FeCAEARegInfReq>
+    
+```xml
+<ar:FeCabReq>
+  <ar:CantReg>
+    3
+  </ar:CantReg>
+  <ar:PtoVta>
+    9800
+  </ar:PtoVta>
+  <ar:CbteTipo>
+    1
+  </ar:CbteTipo>
+</ar:FeCabReq>
+```
+
+    
+```xml
+<ar:FeDetReq>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      38
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      38
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      200.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      100.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      100.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    ,
+    <ar:ImpTrib>
+      0
+    </ar:ImpTrib>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CondicionIVAReceptorId>
+      1
+    </ar:CondicionIVAReceptorId>
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      39
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      39
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      101.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      100.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      0.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    <ar:ImpTrib>
+      1
+    </ar:ImpTrib>
+     Se informa ImpTrib mayor a cero y no se informa el detalle
+    <Tributos>
+      <ar:MonId>
+        PES
+      </ar:MonId>
+      <ar:MonCotiz>
+        1
+      </ar:MonCotiz>
+      <ar:CondicionIVAReceptorId>
+        1
+      </ar:CondicionIVAReceptorId>
+      <ar:CAEA>
+        21064126523746
+      </ar:CAEA>
+    </ar:FECAEADetRequest>
+    <ar:FECAEADetRequest>
+      <ar:Concepto>
+        1
+      </ar:Concepto>
+      <ar:DocTipo>
+        80
+      </ar:DocTipo>
+      <ar:DocNro>
+        30000000007
+      </ar:DocNro>
+      <ar:CbteDesde>
+        40
+      </ar:CbteDesde>
+      <ar:CbteHasta>
+        40
+      </ar:CbteHasta>
+      <ar:CbteFch>
+        20110211
+      </ar:CbteFch>
+      <ar:ImpTotal>
+        100.00
+      </ar:ImpTotal>
+      <ar:ImpTotConc>
+        0.00
+      </ar:ImpTotConc>
+      <ar:ImpNeto>
+        0
+      </ar:ImpNeto>
+      <ar:ImpOpEx>
+        100.00
+      </ar:ImpOpEx>
+      <ar:ImpIva>
+        0
+      </ar:ImpIva>
+      <ar:ImpTrib>
+        0
+      </ar:ImpTrib>
+      <ar:MonId>
+        PES
+      </ar:MonId>
+      <ar:MonCotiz>
+        1
+      </ar:MonCotiz>
+      <ar:CondicionIVAReceptorId>
+        1
+      </ar:CondicionIVAReceptorId>
+      <ar:CAEA>
+        21064126523746
+      </ar:CAEA>
+    </ar:FECAEADetRequest>
+  </ar:FeDetReq>
+```
+
+    </ar:FeCAEARegInfReq>
+  </ar:FECAEARegInformativo>
+```
+
+```
+
+    </soapenv:Body>
+  </soapenv:Envelope>
+```
+ **RESPONSE** 
+
+,
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    <FECAEARegInformativoResponse xmlns="http://ar.gov.afip.dif.FEV1/">
+      <FECAEARegInformativoResult>
+        <FeCabResp>
+          <Cuit>
+            23000000004
+          </Cuit>
+          <PtoVta>
+            9800
+          </PtoVta>
+          <CbteTipo>
+            1
+          </CbteTipo>
+          <FchProceso>
+            20110308
+          </FchProceso>
+          <CantReg>
+            3
+          </CantReg>
+          <Resultado>
+            P
+          </Resultado>
+           Aprobación Parcial de la solicitud
+          <Reproceso>
+            N
+          </Reproceso>
+        </FeCabResp>
+        <FeDetResp>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              38
+            </CbteDesde>
+            <CbteHasta>
+              38
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              A
+            </Resultado>
+             Aprobación del Comprobante
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              39
+            </CbteDesde>
+            <CbteHasta>
+              39
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              R
+            </Resultado>
+             Rechazo del Comprobante
+            <Observaciones>
+               Motivo del rechazo
+              <Obs>
+                <Code>
+                  900
+                </Code>
+                <Msg>
+                  Si ImpTrib es mayor a 0 el objeto Tributos y Tributo son obligatorios.
+                </Msg>
+              </Obs>
+            </Observaciones>
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              40
+            </CbteDesde>
+            <CbteHasta>
+              40
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              R
+            </Resultado>
+             Rechazo del comprobante no fue procesado por haber sido rechazado el comprobante anterior
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+          ,
+        </FeDetResp>
+      </FECAEARegInformativoResult>
+    </FECAEARegInformativoResponse>
+  </soap:Body>
+</soap:Envelope>
+```
+ Se envía un Request con tres Facturas A (número 39, 40 y 41), donde la información enviada en la cabecera del comprobante tiene alguna inconsistencia (se informa que el Request contiene dos comprobantes y se envían tres) entonces se genera un rechazo total de la solicitud. **REQUEST** 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    
+```xml
+
+```xml
+<ar:FECAEARegInformativo>
+  <ar:Auth>
+    <ar:Token>
+      PD…
+    </ar:Token>
+    <ar:Sign>
+      jd..
+    </ar:Sign>
+    <ar:Cuit>
+      23000000004
+    </ar:Cuit>
+  </ar:Auth>
+  <ar:FeCAEARegInfReq>
+    
+```xml
+<ar:FeCabReq>
+  <ar:CantReg>
+    2
+  </ar:CantReg>
+  <ar:PtoVta>
+    9800
+  </ar:PtoVta>
+  <ar:CbteTipo>
+    1
+  </ar:CbteTipo>
+</ar:FeCabReq>
+```
+
+    
+```xml
+<ar:FeDetReq>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      39
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      39
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      200.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      100.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      100.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    <ar:ImpTrib>
+      0
+    </ar:ImpTrib>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CondicionIVAReceptorId>
+      1
+    </ar:CondicionIVAReceptorId>
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      40
+    </ar:CbteDesde>
+    ,
+    <ar:CbteHasta>
+      40
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      100.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      100.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      0.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    <ar:ImpTrib>
+      0
+    </ar:ImpTrib>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CondicionIVAReceptorId>
+      1
+    </ar:CondicionIVAReceptorId>
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      41
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      41
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      100.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      0.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      0
+    </ar:ImpNeto>
+    <ar:ImpOpEx>
+      100.00
+    </ar:ImpOpEx>
+    <ar:ImpIva>
+      0
+    </ar:ImpIva>
+    <ar:ImpTrib>
+      0
+    </ar:ImpTrib>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CondicionIVAReceptorId>
+      1
+    </ar:CondicionIVAReceptorId>
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+</ar:FeDetReq>
+```
+
+  </ar:FeCAEARegInfReq>
+</ar:FECAEARegInformativo>
+```
+
+```
+
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ **RESPONSE** 
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    <FECAEARegInformativoResponse xmlns="http://ar.gov.afip.dif.FEV1/">
+      <FECAEARegInformativoResult>
+        <FeCabResp>
+          <Cuit>
+            23000000004
+          </Cuit>
+          <PtoVta>
+            9800
+          </PtoVta>
+          <CbteTipo>
+            1
+          </CbteTipo>
+          <FchProceso>
+            20110308
+          </FchProceso>
+          <CantReg>
+            2
+          </CantReg>
+          <Resultado>
+            R
+          </Resultado>
+          Rechazo total del envío
+          <Reproceso>
+            N
+          </Reproceso>
+          ,
+        </FeCabResp>
+        <FeDetResp>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              39
+            </CbteDesde>
+            <CbteHasta>
+              39
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              R
+            </Resultado>
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              40
+            </CbteDesde>
+            <CbteHasta>
+              40
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              R
+            </Resultado>
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              41
+            </CbteDesde>
+            <CbteHasta>
+              41
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              R
+            </Resultado>
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+        </FeDetResp>
+        
+```xml
+
+```xml
+<Errors>
+  <Err>
+    Motivo del Rechazo
+    <Code>
+      10002
+    </Code>
+    <Msg>
+      Campo CantReg debe ser igual a lo informado en detalle. Informado: 2, Enviado:3
+    </Msg>
+  </Err>
+</Errors>
+```
+
+```
+
+      </FECAEARegInformativoResult>
+    </FECAEARegInformativoResponse>
+  </soap:Body>
+</soap:Envelope>
+```
+ Se envía un Request con una Facturas B con Importe Gravado y alícuota de IVA al 21%, supera la totalidad de las validaciones. El comprobante es aprobado. **REQUEST** 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
+  <soapenv:Header/>
+  ,
+  <soapenv:Body>
+    
+```xml
+
+```xml
+<ar:FECAEARegInformativo>
+  <ar:Auth>
+    <ar:Token>
+      PD…
+    </ar:Token>
+    <ar:Sign>
+      jd..
+    </ar:Sign>
+    <ar:Cuit>
+      23000000004
+    </ar:Cuit>
+  </ar:Auth>
+  <ar:FeCAEARegInfReq>
+    
+```xml
+<ar:FeCabReq>
+  <ar:CantReg>
+    1
+  </ar:CantReg>
+  <ar:PtoVta>
+    9800
+  </ar:PtoVta>
+  <ar:CbteTipo>
+    6
+  </ar:CbteTipo>
+</ar:FeCabReq>
+```
+
+    
+```xml
+<ar:FeDetReq>
+  <ar:FECAEADetRequest>
+    <ar:Concepto>
+      2
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      45
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      45
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      121.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      0.00
+    </ar:ImpTotConc>
+    <ar:ImpNeto>
+      100
+    </ar:ImpNeto>
+    Imp Neto Gravado
+    <ar:ImpOpEx>
+      0.00
+    </ar:ImpOpEx>
+    <ar:ImpIVA>
+      21
+    </ar:ImpIVA>
+    Importe IVA liquidado
+    <ar:ImpTrib>
+      0
+    </ar:ImpTrib>
+    <ar:FchServDesde>
+      20110101
+    </ar:FchServDesde>
+    <ar:FchServHasta>
+      20110102
+    </ar:FchServHasta>
+    <ar:FchVtoPago>
+      20110220
+    </ar:FchVtoPago>
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CondicionIVAReceptorId>
+      1
+    </ar:CondicionIVAReceptorId>
+    ```xml
+    <ar:Iva>
+      <ar:AlicIva>
+        <ar:Id>
+          5
+        </ar:Id>
+        Alícuota de IVA 21%
+        <ar:BaseImp>
+          100
+        </ar:BaseImp>
+        Base Imponible para la Alícuota indicada en Id
+        <ar:Importe>
+          21
+        </ar:Importe>
+        Imp IVA liquidado
+      </ar:AlicIva>
+    </ar:Iva>
+    ```
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+</ar:FeDetReq>
+```
+
+  </ar:FeCAEARegInfReq>
+</ar:FECAEARegInformativo>
+```
+
+```
+
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ **RESPONSE** 
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    ,
+    <FECAEARegInformativoResponse xmlns="http://ar.gov.afip.dif.FEV1/">
+      <FECAEARegInformativoResult>
+        <FeCabResp>
+          <Cuit>
+            23000000004
+          </Cuit>
+          <PtoVta>
+            9800
+          </PtoVta>
+          <CbteTipo>
+            6
+          </CbteTipo>
+          <FchProceso>
+            20110314
+          </FchProceso>
+          <CantReg>
+            1
+          </CantReg>
+          <Resultado>
+            A
+          </Resultado>
+          <Reproceso>
+            N
+          </Reproceso>
+        </FeCabResp>
+        <FeDetResp>
+          <FECAEADetResponse>
+            <Concepto>
+              2
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              45
+            </CbteDesde>
+            <CbteHasta>
+              45
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              A
+            </Resultado>
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+        </FeDetResp>
+      </FECAEARegInformativoResult>
+    </FECAEARegInformativoResponse>
+  </soap:Body>
+</soap:Envelope>
+```
+ Se envía un Request con una Facturas A con Importe Gravado, alícuota de IVA al 21%, 27% y al 0%, Importes Exentos y No Gravados y con importes de Tributos (IIBB), supera la totalidad de las validaciones. El comprobante es aprobado. **REQUEST** 
+```xml
+<soapenv:Envelope <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    
+```xml
+
+```xml
+<ar:FECAEARegInformativo>
+  <ar:Auth>
+    <ar:Token>
+      PD…
+    </ar:Token>
+    <ar:Sign>
+      jd..
+    </ar:Sign>
+    <ar:Cuit>
+      23000000004
+    </ar:Cuit>
+  </ar:Auth>
+  <ar:FeCAEARegInfReq>
+    
+```xml
+<ar:FeCabReq>
+  <ar:CantReg>
+    1
+  </ar:CantReg>
+  <ar:PtoVta>
+    9800
+  </ar:PtoVta>
+  <ar:CbteTipo>
+    1
+  </ar:CbteTipo>
+</ar:FeCabReq>
+```
+
+    
+```xml
+<ar:FeDetReq>
+  <ar:FECAEADetRequest>
+    ,
+    <ar:Concepto>
+      1
+    </ar:Concepto>
+    <ar:DocTipo>
+      80
+    </ar:DocTipo>
+    <ar:DocNro>
+      30000000007
+    </ar:DocNro>
+    <ar:CbteDesde>
+      40
+    </ar:CbteDesde>
+    <ar:CbteHasta>
+      40
+    </ar:CbteHasta>
+    <ar:CbteFch>
+      20110211
+    </ar:CbteFch>
+    <ar:ImpTotal>
+      549.00
+    </ar:ImpTotal>
+    <ar:ImpTotConc>
+      100.00
+    </ar:ImpTotConc>
+     No Gravado
+    <ar:ImpNeto>
+      300
+    </ar:ImpNeto>
+     Gravado. Igual a la sumatoria de BaseImp del Array de Iva.
+    <ar:ImpOpEx>
+      100.00
+    </ar:ImpOpEx>
+     Imp Exento
+    <ar:ImpIVA>
+      48
+    </ar:ImpIVA>
+     Importe total de IVA liquidado. Es igual a la sumatoria de Importe del Array de Iva.
+    <ar:ImpTrib>
+      1
+    </ar:ImpTrib>
+     Importe total de tributos. Es igual a la sumatoria de Importe del Array de Tributos.
+    <ar:MonId>
+      PES
+    </ar:MonId>
+    <ar:MonCotiz>
+      1
+    </ar:MonCotiz>
+    <ar:CondicionIVAReceptorId>
+      1
+    </ar:CondicionIVAReceptorId>
+    ```xml
+    <ar:Tributos>
+       Detalle de Tributos
+      <ar:Tributo>
+        <ar:Id>
+          2
+        </ar:Id>
+        <ar:Desc>
+          IIBB Pcia Bs AS
+        </ar:Desc>
+        <ar:BaseImp>
+          100
+        </ar:BaseImp>
+        <ar:Alic>
+          1
+        </ar:Alic>
+        <ar:Importe>
+          1
+        </ar:Importe>
+      </ar:Tributo>
+    </ar:Tributos>
+    ```
+
+        
+```xml
+    <ar:Iva>
+       Detalle IVA Liquidado
+      <ar:AlicIva>
+        <ar:Id>
+          5
+        </ar:Id>
+         21% IVA
+        <ar:BaseImp>
+          100
+        </ar:BaseImp>
+        Base Imponible para la Alícuota indicada en Id
+        <ar:Importe>
+          21
+        </ar:Importe>
+        Imp IVA liquidado según Alícuota y Base Imponible.
+      </ar:AlicIva>
+      <ar:AlicIva>
+        <ar:Id>
+          3
+        </ar:Id>
+         0% IVA
+        <ar:BaseImp>
+          100
+        </ar:BaseImp>
+        Base Imponible para la alícuota indicada en Id
+        <ar:Importe>
+          0
+        </ar:Importe>
+        Imp IVA liquidado según Alícuota y Base Imponible.
+      </ar:AlicIva>
+      <ar:AlicIva>
+        <ar:Id>
+          6
+        </ar:Id>
+         27% IVA
+        <ar:BaseImp>
+          100
+        </ar:BaseImp>
+        Base Imponible para la Alícuota indicada en Id
+        <ar:Importe>
+          27
+        </ar:Importe>
+        Imp IVA liquidado según Alícuota y Base Imponible.
+      </ar:AlicIva>
+    </ar:Iva>
+    ```
+    <ar:CAEA>
+      21064126523746
+    </ar:CAEA>
+  </ar:FECAEADetRequest>
+</ar:FeDetReq>
+```
+
+  </ar:FeCAEARegInfReq>
+</ar:FECAEARegInformativo>
+```
+
+```
+
+    ,
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ **RESPONSE** 
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    <FECAEARegInformativoResponse xmlns="http://ar.gov.afip.dif.FEV1/">
+      <FECAEARegInformativoResult>
+        <FeCabResp>
+          <Cuit>
+            23000000004
+          </Cuit>
+          <PtoVta>
+            9800
+          </PtoVta>
+          <CbteTipo>
+            6
+          </CbteTipo>
+          <FchProceso>
+            20110314
+          </FchProceso>
+          <CantReg>
+            1
+          </CantReg>
+          <Resultado>
+            A
+          </Resultado>
+          <Reproceso>
+            N
+          </Reproceso>
+        </FeCabResp>
+        <FeDetResp>
+          <FECAEADetResponse>
+            <Concepto>
+              1
+            </Concepto>
+            <DocTipo>
+              80
+            </DocTipo>
+            <DocNro>
+              30000000007
+            </DocNro>
+            <CbteDesde>
+              40
+            </CbteDesde>
+            <CbteHasta>
+              40
+            </CbteHasta>
+            <CbteFch>
+              20110211
+            </CbteFch>
+            <Resultado>
+              A
+            </Resultado>
+            <CAEA>
+              21064126523746
+            </CAEA>
+          </FECAEADetResponse>
+        </FeDetResp>
+      </FECAEARegInformativoResult>
+    </FECAEARegInformativoResponse>
+  </soap:Body>
+</soap:Envelope>
+```
+ 

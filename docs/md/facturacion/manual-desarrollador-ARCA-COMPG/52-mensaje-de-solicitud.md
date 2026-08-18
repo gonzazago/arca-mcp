@@ -1,0 +1,14 @@
+##### Mensaje de solicitud 
+
+El método no posee parámetros de ingreso 
+
+, 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <ar:FEDummy/>
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ 

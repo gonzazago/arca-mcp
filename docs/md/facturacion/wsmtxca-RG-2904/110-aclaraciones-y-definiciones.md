@@ -1,0 +1,3 @@
+### Aclaraciones y Definiciones 
+
+ (1) No se especifica la longitud del atributo token y del atributo sign porque es variable y depende de la respuesta del WSAA. (2) Formato para el tipo de dato date es: AAAA-MM-DD, sin uso horario. (3) El separador de decimales es el punto “. ” (4) El método de redondeo a utilizar es Round Half Even. (5) Error Absoluto y Error Relativo Error Absoluto eabs : Es la diferencia entre el valor medido (calculado) y el valor real Error Relativo erel : Es el cociente entre el valor error absoluto y el valor real. En ambos casos se tomará el valor absoluto, es decir el signo resultante de la operación no se considerará. 

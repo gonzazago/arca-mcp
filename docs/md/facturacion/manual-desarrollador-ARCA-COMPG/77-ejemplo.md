@@ -1,0 +1,86 @@
+##### Ejemplo 
+
+**REQUEST** 
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <ar:FECompConsultar>
+      <ar:Auth>
+        ,
+        <ar:Token>
+          string
+        </ar:Token>
+        <ar:Sign>
+          string
+        </ar:Sign>
+        <ar:Cuit>
+          33693450239
+        </ar:Cuit>
+      </ar:Auth>
+      <ar:FeCompConsReq>
+        <ar:CbteTipo>
+          1
+        </ar:CbteTipo>
+        <ar:CbteNro>
+          1
+        </ar:CbteNro>
+        <ar:PtoVta>
+          12
+        </ar:PtoVta>
+      </ar:FeCompConsReq>
+    </ar:FECompConsultar>
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+ **RESPONSE** <soap12:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:ar="http://ar.gov.afip.dif.FEV1/"> <soap12:Header/> <soap12:Body> <FECompConsultarResponse> <FECompConsultarResult> <ResultGet> <Concepto> **1** </Concepto> <DocTipo> **80** </DocTipo> <DocNro> **20111111112** </DocNro> <CbteDesde> **1** </CbteDesde> <CbteHasta> **1** </CbteHasta> <CbteFch> **20100903** </CbteFch> <ImpTotal> **184.05** </ImpTotal> <ImpTotConc> **0** </ImpTotConc> <ImpNeto> **150** </ImpNeto> <ImpOpEx> **0** </ImpOpEx> <ImpTrib> **7.8** </ImpTrib> <ImpIVA>26.25</ImpIVA> <FchServDesde></FchServDesde> <FchServHasta></FchServHasta> <FchVtoPago></FchVtoPago> <MonId> **PES** </MonId> <MonCotiz> **1** </MonCotiz> 
+```xml
+<Tributos>
+  <Tributo>
+    <Id>
+      **99**
+    </Id>
+    <Desc>
+      **Impuesto Municipal Matanza**
+    </Desc>
+    <BaseImp>
+      **150**
+    </BaseImp>
+    <Alic>
+      **5.2**
+    </Alic>
+    <Importe>
+      **7.8**
+    </Importe>
+  </Tributo>
+</Tributos>
+```
+ 
+```xml
+<Iva>
+  <AlicIva>
+    <Id>
+      **5**
+    </Id>
+    <BaseImp>
+      **100**
+    </BaseImp>
+    <Importe>
+      **21**
+    </Importe>
+  </AlicIva>
+  <AlicIva>
+    <Id>
+      **4**
+    </Id>
+    <BaseImp>
+      **50**
+    </BaseImp>
+    ,
+    <Importe>
+      5.25
+    </Importe>
+  </AlicIva>
+</Iva>
+```
+ <Resultado>A</Resultado> <CodAutorizacion> **41124578989845** </CodAutorizacion> <EmisionTipo>CAE</EmisionTipo> <FchVto> 20100913 </FchVto> <FchProceso> 20100902 </FchProceso> <PtoVta> 12 </PtoVta> <CbteTipo> 1 </CbteTipo> </ResultGet> </FECompConsultarResult> </FECompConsultarResponse> </soapenv:Body> </soapenv:Envelope> 
