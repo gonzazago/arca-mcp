@@ -1,41 +1,9 @@
 import type { ToolDefinition } from "../types.js";
 import { z } from "zod";
-import { sendSoapRequest } from "../utils/soap.js";
+import { getUltimoComprobante } from "../../application/use-cases/invoiceUseCase.js";
 
 const WSFE_URL_HOMO = "https://wswhomo.afip.gov.ar/wsfev1/service.asmx";
 const WSFE_URL_PROD = "https://servicios1.afip.gov.ar/wsfev1/service.asmx";
-
-export async function getUltimoComprobante(url: string, cuit: number, token: string, sign: string, ptoVta: number, cbteTipo: number): Promise<number> {
-  const xml = `<?xml version="1.0" encoding="utf-8"?>
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ar="http://ar.gov.afip.dif.FEV1/">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <ar:FECompUltimoAutorizado>
-         <ar:Auth>
-            <ar:Token>${token}</ar:Token>
-            <ar:Sign>${sign}</ar:Sign>
-            <ar:Cuit>${cuit}</ar:Cuit>
-         </ar:Auth>
-         <ar:PtoVta>${ptoVta}</ar:PtoVta>
-         <ar:CbteTipo>${cbteTipo}</ar:CbteTipo>
-      </ar:FECompUltimoAutorizado>
-   </soapenv:Body>
-</soapenv:Envelope>`;
-
-  const resText = await sendSoapRequest(url, "http://ar.gov.afip.dif.FEV1/FECompUltimoAutorizado", xml);
-  
-  // Buscar errores
-  const errorMatch = resText.match(/<Err>\s*<Code>(.*?)<\/Code>\s*<Msg>(.*?)<\/Msg>/);
-  if (errorMatch) {
-    throw new Error(`AFIP Error [${errorMatch[1]}]: ${errorMatch[2]}`);
-  }
-
-  const cbteMatch = resText.match(/<CbteNro>(\d+)<\/CbteNro>/);
-  if (!cbteMatch || !cbteMatch[1]) {
-    throw new Error("No se pudo obtener el último número de comprobante de la respuesta XML.");
-  }
-  return parseInt(cbteMatch[1], 10);
-}
 
 export const getUltimoCbteTool: ToolDefinition = {
   name: "get_ultimo_comprobante",

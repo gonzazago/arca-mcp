@@ -1,8 +1,8 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { generateEmbedding, initEmbedder } from '../vector_store/embedder/embedder.js';
-import { insertDocument, initDB, pool } from '../vector_store/db/db.js';
+import { generateEmbedding, initEmbedder } from '../embedder/embedder.js';
+import { insertDocument, initDB, pool } from '../vector_store/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

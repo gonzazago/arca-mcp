@@ -3,13 +3,13 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 import cors from "cors";
-import { ragSearchTool } from "./tools/ragSearch.js";
-import { createInvoiceTool } from "./tools/createInvoice.js";
-import { authGuideResource } from "./resources/guides/authGuide.js";
-import { invoiceGuideResource } from "./resources/guides/invoiceGuide.js";
-import { getUltimoCbteTool } from "./tools/getUltimoComprobante.js";
-import { getTaTool } from "./tools/getTa.js";
-import type { ToolDefinition, ResourceDefinition } from "./types.js";
+import { ragSearchTool } from "./mcp/tools/ragSearch.js";
+import { createInvoiceTool } from "./mcp/tools/createInvoice.js";
+import { authGuideResource } from "./mcp/resources/guides/authGuide.js";
+import { invoiceGuideResource } from "./mcp/resources/guides/invoiceGuide.js";
+import { getUltimoCbteTool } from "./mcp/tools/getUltimoComprobante.js";
+import { getTaTool } from "./mcp/tools/getTa.js";
+import type { ToolDefinition, ResourceDefinition } from "./mcp/types.js";
 
 // Función para crear y configurar una nueva instancia del servidor
 function createMcpServer() {

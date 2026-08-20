@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { pool, initDB, insertDocument } from '../vector_store/db/db.js';
-import { generateEmbedding } from '../vector_store/embedder/embedder.js';
+import { pool, initDB, insertDocument } from '../vector_store/db.js';
+import { generateEmbedding } from '../embedder/embedder.js';
 
 async function processDirectory(dir: string, sourcePdf: string) {
     const entries = await fs.readdir(dir, { withFileTypes: true });
