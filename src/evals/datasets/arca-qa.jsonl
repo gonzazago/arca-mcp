@@ -1,0 +1,49 @@
+{"id":"WSAA-001","question":"¿Qué necesito para poder consumir los métodos del Web Service de Facturación Electrónica?","category":"wsaa","difficulty":"easy","relevant_sources":["13-autenticaci-n.md"]}
+{"id":"WSAA-002","question":"¿Qué valor debe tener el campo service al solicitar el Ticket de Acceso para facturación electrónica?","category":"wsaa","difficulty":"easy","relevant_sources":["13-autenticaci-n.md"]}
+{"id":"WSAA-003","question":"¿Cuánto tiempo dura el Ticket de Acceso obtenido mediante WSAA para WSFE?","category":"wsaa","difficulty":"easy","relevant_sources":["13-autenticaci-n.md"]}
+{"id":"WSAA-004","question":"¿Qué debo tener previamente para poder consumir el WS de Autenticación y Autorización?","category":"wsaa","difficulty":"medium","relevant_sources":["13-autenticaci-n.md"]}
+{"id":"WSAA-005","question":"¿La autenticación es necesaria para todos los métodos disponibles en el Web Service de Facturación Electrónica?","category":"wsaa","difficulty":"medium","relevant_sources":["13-autenticaci-n.md"]}
+
+{"id":"FECAE-001","question":"¿Qué operación se utiliza para solicitar la autorización de un comprobante electrónico mediante CAE?","category":"fecaesolicitar","difficulty":"easy","relevant_sources":["21-m-todo-de-autorizaci-n-de-comprobantes-electr-nico.md"]}
+{"id":"FECAE-002","question":"¿Qué puede ocurrir cuando una solicitud de autorización supera todas las validaciones?","category":"fecaesolicitar","difficulty":"easy","relevant_sources":["21-m-todo-de-autorizaci-n-de-comprobantes-electr-nico.md"]}
+{"id":"FECAE-003","question":"¿Qué diferencia existe entre una validación excluyente y una no excluyente al solicitar un CAE?","category":"fecaesolicitar","difficulty":"medium","relevant_sources":["21-m-todo-de-autorizaci-n-de-comprobantes-electr-nico.md"]}
+{"id":"FECAE-004","question":"¿Qué información se envía en la cabecera de una solicitud FECAESolicitar?","category":"fecaesolicitar","difficulty":"medium","relevant_sources":["21-m-todo-de-autorizaci-n-de-comprobantes-electr-nico.md"]}
+{"id":"FECAE-005","question":"¿Qué representa CantReg dentro de FeCabReq?","category":"fecaesolicitar","difficulty":"medium","relevant_sources":["21-m-todo-de-autorizaci-n-de-comprobantes-electr-nico.md"]}
+{"id":"FECAE-006","question":"¿Qué datos del comprobante se deben informar dentro de FECAEDetRequest?","category":"fecaesolicitar","difficulty":"medium","relevant_sources":["21-m-todo-de-autorizaci-n-de-comprobantes-electr-nico.md"]}
+{"id":"FECAE-007","question":"¿Qué campos se utilizan para indicar el rango de numeración del comprobante que se solicita autorizar?","category":"fecaesolicitar","difficulty":"medium","relevant_sources":["21-m-todo-de-autorizaci-n-de-comprobantes-electr-nico.md"]}
+{"id":"FECAE-008","question":"¿Qué información se debe enviar cuando el comprobante está asociado a otro comprobante?","category":"fecaesolicitar","difficulty":"hard","relevant_sources":["21-m-todo-de-autorizaci-n-de-comprobantes-electr-nico.md"]}
+
+{"id":"CAEA-001","question":"¿Qué método se utiliza para solicitar un CAEA?","category":"caea","difficulty":"easy","relevant_sources":["22-m-todo-de-obtenci-n-de-caea--fecaeasolicitar-.md"]}
+{"id":"CAEA-002","question":"¿Durante qué período puede solicitarse un CAEA?","category":"caea","difficulty":"medium","relevant_sources":["22-m-todo-de-obtenci-n-de-caea--fecaeasolicitar-.md"]}
+{"id":"CAEA-003","question":"¿Cuánto tiempo antes del comienzo de una quincena se puede solicitar un CAEA?","category":"caea","difficulty":"medium","relevant_sources":["22-m-todo-de-obtenci-n-de-caea--fecaeasolicitar-.md"]}
+{"id":"CAEA-004","question":"¿Cómo se dividen las quincenas para la vigencia del CAEA?","category":"caea","difficulty":"medium","relevant_sources":["22-m-todo-de-obtenci-n-de-caea--fecaeasolicitar-.md"]}
+{"id":"CAEA-005","question":"¿Qué información devuelve la solicitud de un CAEA cuando supera las validaciones?","category":"caea","difficulty":"easy","relevant_sources":["22-m-todo-de-obtenci-n-de-caea--fecaeasolicitar-.md"]}
+
+{"id":"PARAM-001","question":"¿Cómo puedo consultar los tipos de comprobantes habilitados en el Web Service?","category":"parametros","difficulty":"easy","relevant_sources":["25--feparamgettiposcbte-.md"]}
+{"id":"PARAM-002","question":"¿Qué método permite obtener los tipos de conceptos disponibles para facturación electrónica?","category":"parametros","difficulty":"easy","relevant_sources":["27--feparamgettiposconcepto-.md"]}
+{"id":"PARAM-003","question":"¿Cómo puedo obtener los tipos de documentos admitidos por el Web Service?","category":"parametros","difficulty":"easy","relevant_sources":["29--feparamgettiposdoc-.md"]}
+{"id":"PARAM-004","question":"¿Cómo puedo consultar las alícuotas de IVA disponibles en WSFE?","category":"parametros","difficulty":"easy","relevant_sources":["32--feparamgettiposiva-.md"]}
+{"id":"PARAM-005","question":"¿Qué información devuelve FEParamGetTiposCbte?","category":"parametros","difficulty":"medium","relevant_sources":["25--feparamgettiposcbte-.md"]}
+{"id":"PARAM-006","question":"¿Qué información devuelve FEParamGetTiposConcepto?","category":"parametros","difficulty":"medium","relevant_sources":["27--feparamgettiposconcepto-.md"]}
+{"id":"PARAM-007","question":"¿Qué datos de autenticación necesita FEParamGetTiposDoc?","category":"parametros","difficulty":"medium","relevant_sources":["29--feparamgettiposdoc-.md"]}
+{"id":"PARAM-008","question":"¿Qué información se obtiene mediante FEParamGetPtosVenta?","category":"parametros","difficulty":"medium","relevant_sources":["44-cae-y-caea-v-a-web-services--feparamgetptosventa-.md"]}
+
+{"id":"VOUCHER-001","question":"¿Cómo puedo saber cuál fue el último comprobante autorizado?","category":"comprobantes","difficulty":"easy","relevant_sources":["55-recuperador-de-ultimo-valor-de-comprobante-registr.md"]}
+{"id":"VOUCHER-002","question":"¿Qué datos determinan el último comprobante que devuelve FECompUltimoAutorizado?","category":"comprobantes","difficulty":"medium","relevant_sources":["55-recuperador-de-ultimo-valor-de-comprobante-registr.md"]}
+{"id":"VOUCHER-003","question":"¿Puedo consultar el último comprobante sin indicar el punto de venta?","category":"comprobantes","difficulty":"hard","relevant_sources":["55-recuperador-de-ultimo-valor-de-comprobante-registr.md"]}
+{"id":"VOUCHER-004","question":"¿Qué método debo usar para consultar los datos de un comprobante que ya fue emitido?","category":"comprobantes","difficulty":"easy","relevant_sources":["73-m-todo-para-consultar-comprobantes-emitidos-y-su-c.md"]}
+
+{"id":"CURRENCY-001","question":"¿Cómo puedo consultar la cotización de una moneda desde WSFE?","category":"monedas","difficulty":"easy","relevant_sources":["46-recuperador-de-cotizaci-n-de-moneda--feparamgetcot.md"]}
+{"id":"CURRENCY-002","question":"¿Qué información necesito enviar para consultar la cotización de una moneda?","category":"monedas","difficulty":"medium","relevant_sources":["46-recuperador-de-cotizaci-n-de-moneda--feparamgetcot.md"]}
+{"id":"CURRENCY-003","question":"¿Qué representa FchCotiz al consultar una cotización?","category":"monedas","difficulty":"medium","relevant_sources":["46-recuperador-de-cotizaci-n-de-moneda--feparamgetcot.md"]}
+{"id":"CURRENCY-004","question":"¿El valor obtenido por FEParamGetCotizacion debe considerarse un valor definitivo o solamente orientativo?","category":"monedas","difficulty":"medium","relevant_sources":["46-recuperador-de-cotizaci-n-de-moneda--feparamgetcot.md"]}
+
+{"id":"ERROR-001","question":"¿Qué significa el error 12000 relacionado con MonId?","category":"errores","difficulty":"medium","relevant_sources":["47-validaciones-y-errores.md"]}
+{"id":"ERROR-002","question":"¿Qué significa el error 12001 al enviar una factura?","category":"errores","difficulty":"easy","relevant_sources":["47-validaciones-y-errores.md"]}
+{"id":"ERROR-003","question":"¿Qué formato debe tener FchCotiz para evitar el error 12002?","category":"errores","difficulty":"easy","relevant_sources":["47-validaciones-y-errores.md"]}
+{"id":"ERROR-004","question":"¿Cómo puedo conocer los valores válidos para MonId antes de solicitar un comprobante?","category":"errores","difficulty":"medium","relevant_sources":["47-validaciones-y-errores.md","46-recuperador-de-cotizaci-n-de-moneda--feparamgetcot.md"]}
+{"id":"ERROR-005","question":"¿Qué ocurre si la condición frente al IVA del receptor informada en un comprobante no es válida?","category":"errores","difficulty":"hard","relevant_sources":["21-m-todo-de-autorizaci-n-de-comprobantes-electr-nico.md"]}
+
+{"id":"CAEA-006","question":"¿Cómo se informa que un CAEA otorgado no tuvo movimientos para un punto de venta?","category":"caea","difficulty":"medium","relevant_sources":["48-m-todo-para-informar-caea-sin-movimiento--fecaeasi.md"]}
+{"id":"CAEA-007","question":"¿Qué datos son necesarios para informar un CAEA sin movimiento?","category":"caea","difficulty":"medium","relevant_sources":["48-m-todo-para-informar-caea-sin-movimiento--fecaeasi.md"]}
+{"id":"CAEA-008","question":"¿Cómo se informan los comprobantes emitidos asociados a un CAEA?","category":"caea","difficulty":"medium","relevant_sources":["63-m-todo-para-informar-comprobantes-emitidos-con-cae.md"]}

@@ -31,6 +31,9 @@
     "dev": "npx tsx watch src/index.ts",
     "dev:http": "PORT=3001 npx tsx watch src/index.ts",
     "inspect": "npx @modelcontextprotocol/inspector node dist/index.js",
-    "ingest:docs": "npx tsx src/scripts/ingest-docs.ts"
+    "ingest:docs": "npx tsx src/rag/scripts/ingest-docs.ts",
+    "eval:retrieval": "npx tsx src/evals/retrieval/evaluate-retrieval.ts",
+    "eval:reranking": "npx tsx src/evals/reranking/evaluate-reranking.ts",
+    "eval:e2e": "npx tsx src/evals/e2e/evaluate-rag.ts"
   }
 }
