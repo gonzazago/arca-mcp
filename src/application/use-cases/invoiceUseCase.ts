@@ -61,13 +61,13 @@ export async function createInvoice(args: any) {
   return result;
 }
 
-function calculateTaxes(cbteTipo: number, importeTotal: number) {
-  // Factura C (11) no discrimina IVA
+function calculateTaxes(cbteTipo: number, montoEntrada: number) {
+  // Factura C (11) no discrimina IVA, pero ImpNeto representa el Subtotal (ImpTotal = ImpNeto + ImpTrib)
   if (cbteTipo === 11) {
     return {
-      impTotal: importeTotal.toFixed(2),
+      impTotal: montoEntrada.toFixed(2),
       impTotConc: "0.00",
-      impNeto: "0.00",
+      impNeto: montoEntrada.toFixed(2),
       impOpEx: "0.00",
       impTrib: "0.00",
       impIva: "0.00",
@@ -75,23 +75,47 @@ function calculateTaxes(cbteTipo: number, importeTotal: number) {
     };
   }
 
-  // Factura A (1) o B (6)
-  // Asumimos IVA 21% por defecto para simplificar
-  const netAmount = importeTotal / 1.21;
-  const ivaAmount = importeTotal - netAmount;
+  // Factura A (1)
+  // El monto ingresado se asume como Subtotal (Neto). El IVA (21%) se suma para llegar al Total.
+  if (cbteTipo === 1) {
+    const netAmount = montoEntrada;
+    const ivaAmount = netAmount * 0.21;
+    const totalAmount = netAmount + ivaAmount;
+
+    return {
+      impTotal: totalAmount.toFixed(2),
+      impTotConc: "0.00",
+      impNeto: netAmount.toFixed(2),
+      impOpEx: "0.00",
+      impTrib: "0.00",
+      impIva: ivaAmount.toFixed(2),
+      ivaArray: [
+        {
+          Id: 5, // Código AFIP para 21%
+          BaseImp: netAmount.toFixed(2),
+          Importe: ivaAmount.toFixed(2)
+        }
+      ]
+    };
+  }
+
+  // Factura B (6)
+  // Asumimos IVA 21% incluido en el monto. El neto se calcula hacia atrás.
+  const netAmountB = montoEntrada / 1.21;
+  const ivaAmountB = montoEntrada - netAmountB;
 
   return {
-    impTotal: importeTotal.toFixed(2),
+    impTotal: montoEntrada.toFixed(2),
     impTotConc: "0.00",
-    impNeto: netAmount.toFixed(2),
+    impNeto: netAmountB.toFixed(2),
     impOpEx: "0.00",
     impTrib: "0.00",
-    impIva: ivaAmount.toFixed(2),
+    impIva: ivaAmountB.toFixed(2),
     ivaArray: [
       {
         Id: 5, // Código AFIP para 21%
-        BaseImp: netAmount.toFixed(2),
-        Importe: ivaAmount.toFixed(2)
+        BaseImp: netAmountB.toFixed(2),
+        Importe: ivaAmountB.toFixed(2)
       }
     ]
   };
@@ -103,6 +127,19 @@ function buildFECAESolicitarXml(args: any, math: any, cbteNro: number, cbteFch: 
   const fchServDesdeXml = isServices && args.fchServDesde ? `<ar:FchServDesde>${args.fchServDesde}</ar:FchServDesde>` : "";
   const fchServHastaXml = isServices && args.fchServHasta ? `<ar:FchServHasta>${args.fchServHasta}</ar:FchServHasta>` : "";
   const fchVtoPagoXml = isServices && args.fchVtoPago ? `<ar:FchVtoPago>${args.fchVtoPago}</ar:FchVtoPago>` : "";
+
+  let condicionIva = args.condicionIvaReceptorId;
+  if (!condicionIva) {
+    if (args.cbteTipo === 1) {
+      condicionIva = 1; // IVA Responsable Inscripto
+    } else if (args.docTipo === 96 || args.docTipo === 99) {
+      condicionIva = 5; // Consumidor Final
+    } else {
+      condicionIva = 5; // Consumidor Final por defecto
+    }
+  }
+
+  const condicionIvaXml = `<ar:CondicionIVAReceptorId>${condicionIva}</ar:CondicionIVAReceptorId>`;
 
   let ivaBlock = "";
   if (math.ivaArray.length > 0) {
@@ -151,7 +188,8 @@ function buildFECAESolicitarXml(args: any, math: any, cbteNro: number, cbteFch: 
                   ${fchServHastaXml}
                   ${fchVtoPagoXml}
                   <ar:MonId>PES</ar:MonId>
-                  <ar:MonCotiz>1</ar:MonCotiz>${ivaBlock}
+                  <ar:MonCotiz>1</ar:MonCotiz>
+                  ${condicionIvaXml}${ivaBlock}
                </ar:FECAEDetRequest>
             </ar:FeDetReq>
          </ar:FeCAEReq>
@@ -161,11 +199,6 @@ function buildFECAESolicitarXml(args: any, math: any, cbteNro: number, cbteFch: 
 }
 
 function parseFECAESolicitarResponse(xml: string, expectedCbteNro: number) {
-  const obsMatch = xml.match(/<Obs>[\s\S]*?<Msg>(.*?)<\/Msg>[\s\S]*?<\/Obs>/);
-  if (obsMatch) {
-    throw new Error(`AFIP Observación: ${obsMatch[1]}`);
-  }
-
   const errMatch = xml.match(/<Err>\s*<Code>(.*?)<\/Code>\s*<Msg>(.*?)<\/Msg>\s*<\/Err>/);
   if (errMatch) {
     throw new Error(`AFIP Error [${errMatch[1]}]: ${errMatch[2]}`);
@@ -175,12 +208,16 @@ function parseFECAESolicitarResponse(xml: string, expectedCbteNro: number) {
   const caeMatch = xml.match(/<CAE>(.*?)<\/CAE>/);
   const vtoMatch = xml.match(/<CAEFchVto>(.*?)<\/CAEFchVto>/);
 
-  if (!resultadoMatch || (resultadoMatch[1] !== "A" && resultadoMatch[1] !== "R")) {
-    throw new Error("No se pudo parsear el resultado de la solicitud CAE.");
+  if (resultadoMatch && resultadoMatch[1] === "R") {
+    const obsMatch = xml.match(/<Obs>[\s\S]*?<Msg>(.*?)<\/Msg>[\s\S]*?<\/Obs>/);
+    if (obsMatch) {
+      throw new Error(`AFIP Rechazo / Observación: ${obsMatch[1]}`);
+    }
+    throw new Error("El comprobante fue Rechazado por AFIP sin proveer más detalles observables.");
   }
 
-  if (resultadoMatch[1] === "R") {
-    throw new Error("El comprobante fue Rechazado por AFIP sin proveer más detalles observables.");
+  if (!resultadoMatch || (resultadoMatch[1] !== "A" && resultadoMatch[1] !== "R")) {
+    throw new Error("No se pudo parsear el resultado de la solicitud CAE.");
   }
 
   return {
