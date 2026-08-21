@@ -10,7 +10,8 @@ const taCache = new Map<string, { token: string; sign: string; expiration: Date 
 
 export async function getAuthToken(certPath: string, keyPath: string, service: string, environment: "homologacion" | "produccion") {
   const cacheFile = path.resolve(process.cwd(), ".cache", "ta_cache.json");
-  const cacheKey = `${environment}_${service}_${certPath}`;
+  const normalizedCertPath = path.resolve(certPath);
+  const cacheKey = `${environment}_${service}_${normalizedCertPath}`;
 
   let cached = taCache.get(cacheKey);
 
@@ -96,18 +97,28 @@ export async function getAuthToken(certPath: string, keyPath: string, service: s
 
   const resText = await sendSoapRequest(url, "", soapXml);
 
-  const tokenMatch = resText.match(/<token>([^<]+)<\/token>/);
-  const signMatch = resText.match(/<sign>([^<]+)<\/sign>/);
+  const unescapedXml = resText
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, "&");
+
+  const tokenMatch = unescapedXml.match(/<token>([^<]+)<\/token>/);
+  const signMatch = unescapedXml.match(/<sign>([^<]+)<\/sign>/);
+  const expMatch = unescapedXml.match(/<expirationTime>([^<]+)<\/expirationTime>/);
 
   if (!tokenMatch || !tokenMatch[1] || !signMatch || !signMatch[1]) {
     throw new Error(`Respuesta fallida del WSAA: ${resText}`);
   }
 
+  const expirationDate = expMatch && expMatch[1] ? new Date(expMatch[1]) : expTime;
+
   const result = {
     status: "OK (Nuevo)",
     token: tokenMatch[1],
     sign: signMatch[1],
-    expiration: expTime
+    expiration: expirationDate
   };
 
   taCache.set(cacheKey, result);

@@ -1,6 +1,6 @@
-import type { ToolDefinition } from "../types.js";
+import type { ToolDefinition } from "../../types.js";
 import { z } from "zod";
-import { searchArcaDocs } from "../../application/use-cases/ragUseCase.js";
+import { searchArcaDocs } from "../../../application/use-cases/ragUseCase.js";
 
 export const ragSearchTool: ToolDefinition = {
   name: "query_arca_docs",

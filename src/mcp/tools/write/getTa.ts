@@ -1,6 +1,6 @@
-import type { ToolDefinition } from "../types.js";
+import type { ToolDefinition } from "../../types.js";
 import { z } from "zod";
-import { getAuthToken } from "../../application/use-cases/authUseCase.js";
+import { getAuthToken } from "../../../application/use-cases/authUseCase.js";
 
 export const getTaTool: ToolDefinition = {
   name: "get_ta",
