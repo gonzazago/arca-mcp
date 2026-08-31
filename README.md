@@ -1,3 +1,5 @@
+[![M8ven Live Monitored](https://m8ven.ai/badge/mcp/gonzazago-arca-mcp-jmphde)](https://m8ven.ai/mcp/gonzazago-arca-mcp-jmphde)
+
 # Arca MCP Server
 
 Servidor [Model Context Protocol (MCP)](https://modelcontextprotocol.io) implementado en TypeScript para el proyecto Arca.
